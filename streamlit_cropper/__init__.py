@@ -79,7 +79,7 @@ def _get_cropped_image(img_file:Image, should_resize_image:bool, orig_file: Imag
     return cropped_img
 
 def st_cropper(img_file: Image, realtime_update: bool = True, default_coords: Optional[tuple] = None, box_color: str = 'blue', aspect_ratio: tuple = None,
-               return_type: str = 'image', box_algorithm=None, key=None, should_resize_image: bool = True, stroke_width = 3) -> Image.Image | dict | tuple[Image.Image, dict]:
+               return_type: str = 'image', box_algorithm=None, key=None, should_resize_image: bool = True, resize_max_height = 700, resize_max_width = 700, stroke_width = 3) -> Image.Image | dict | tuple[Image.Image, dict]:
     """Create a new instance of "st_cropper".
 
     Parameters
@@ -115,6 +115,12 @@ def st_cropper(img_file: Image, realtime_update: bool = True, default_coords: Op
         A boolean to select whether the input image should be resized. As default the image
         will be resized to 700x700 pixel for streamlit display. Set to false when using
         custom box_algorithm.
+    resize_max_height: int
+        The maximum height in pixels to which the image will be resized if
+        should_resize_image is True. Defaults to 700.
+    resize_max_width: int
+        The maximum width in pixels to which the image will be resized if
+        should_resize_image is True. Defaults to 700.
     stroke_width: int
         The width of the bounding box
 
@@ -139,7 +145,7 @@ def st_cropper(img_file: Image, realtime_update: bool = True, default_coords: Op
 
     # Load the image and resize to be no wider than the streamlit widget size
     if should_resize_image:
-        img_file = _resize_img(img_file)
+        img_file = _resize_img(img_file, resize_max_height, resize_max_width)
         resized_ratio_w = orig_file.width / img_file.width
         resized_ratio_h = orig_file.height / img_file.height
 
