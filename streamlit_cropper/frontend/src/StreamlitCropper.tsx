@@ -16,6 +16,56 @@ interface PythonArgs {
     lockAspect: boolean
 }
 
+const clamp = (value: number, min: number, max: number) => {
+    if (value < min) return min;
+    if (value > max) return max;
+    return value;
+};
+
+const keepRectInsideCanvas = (rect: Rect, fabricCanvas: Canvas, lockAspect: boolean) => {
+    const canvasWidth = fabricCanvas.getWidth();
+    const canvasHeight = fabricCanvas.getHeight();
+    const baseWidth = rect.width || 0;
+    const baseHeight = rect.height || 0;
+    const currentScaleX = rect.scaleX || 1;
+    const currentScaleY = rect.scaleY || 1;
+
+    if (baseWidth > 0 && baseHeight > 0) {
+        const maxScaleX = canvasWidth / baseWidth;
+        const maxScaleY = canvasHeight / baseHeight;
+
+        if (lockAspect) {
+            const maxUniformScale = Math.min(maxScaleX, maxScaleY);
+            if (currentScaleX > maxUniformScale || currentScaleY > maxUniformScale) {
+                rect.set({
+                    scaleX: maxUniformScale,
+                    scaleY: maxUniformScale,
+                });
+            }
+        } else {
+            if (currentScaleX > maxScaleX) {
+                rect.set({ scaleX: maxScaleX });
+            }
+            if (currentScaleY > maxScaleY) {
+                rect.set({ scaleY: maxScaleY });
+            }
+        }
+    }
+
+    const scaledWidth = rect.getScaledWidth();
+    const scaledHeight = rect.getScaledHeight();
+    const maxLeft = Math.max(canvasWidth - scaledWidth, 0);
+    const maxTop = Math.max(canvasHeight - scaledHeight, 0);
+    const nextLeft = clamp(rect.left ?? 0, 0, maxLeft);
+    const nextTop = clamp(rect.top ?? 0, 0, maxTop);
+
+    rect.set({
+        left: nextLeft,
+        top: nextTop,
+    });
+    rect.setCoords();
+    fabricCanvas.requestRenderAll();
+};
 
 
 const StreamlitCropper = (props: ComponentProps) => {
@@ -73,6 +123,7 @@ const StreamlitCropper = (props: ComponentProps) => {
         });
         fabricCanvas.add(rect);
         rectRef.current = rect;
+        keepRectInsideCanvas(rect, fabricCanvas, lockAspect);
 
         setCanvas(fabricCanvas);
         Streamlit.setFrameHeight();
@@ -111,7 +162,28 @@ const StreamlitCropper = (props: ComponentProps) => {
         });
         rect.setCoords();
         canvas.requestRenderAll();
+        keepRectInsideCanvas(rect, canvas, lockAspect);
     }, [props.args, canvas]);
+
+    useEffect(() => {
+        if (!canvas || !rectRef.current) return;
+        const rect = rectRef.current;
+        const lockAspect = props.args.lockAspect;
+
+        const enforceBounds = () => {
+            keepRectInsideCanvas(rect, canvas, lockAspect);
+        };
+
+        rect.on("moving", enforceBounds);
+        rect.on("scaling", enforceBounds);
+
+        enforceBounds();
+
+        return () => {
+            rect.off("moving", enforceBounds);
+            rect.off("scaling", enforceBounds);
+        };
+    }, [canvas, props.args.lockAspect]);
 
 
     /**
