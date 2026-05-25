@@ -1,0 +1,199 @@
+# gitleaks カスタム設定
+# デフォルトルールのエントロピー閾値が厳しすぎるため、
+# カスタムルールのみ使用（パターンマッチで確実に検知）
+
+title = "gitleaks custom config"
+
+# --- AWS ---
+[[rules]]
+id = "aws-access-key-id"
+description = "AWS Access Key ID"
+regex = '''AKIA[0-9A-Z]{16}'''
+tags = ["key", "AWS"]
+
+[[rules]]
+id = "aws-secret-key"
+description = "AWS Secret Access Key"
+regex = '''(?i)(aws_secret_access_key|aws_secret_key)\s*=\s*["']?([A-Za-z0-9/+=]{40})["']?'''
+tags = ["key", "AWS"]
+
+# --- GitHub ---
+[[rules]]
+id = "github-pat"
+description = "GitHub Personal Access Token"
+regex = '''gh[pousr]_[A-Za-z0-9_]{36,255}'''
+tags = ["key", "GitHub"]
+
+[[rules]]
+id = "github-fine-grained-pat"
+description = "GitHub Fine-grained PAT"
+regex = '''github_pat_[A-Za-z0-9_]{22,255}'''
+tags = ["key", "GitHub"]
+
+# --- GCP ---
+[[rules]]
+id = "gcp-api-key"
+description = "GCP API Key"
+regex = '''AIzaSy[A-Za-z0-9_-]{33}'''
+tags = ["key", "GCP"]
+
+[[rules]]
+id = "gcp-service-account"
+description = "GCP Service Account Private Key (JSON)"
+regex = '''"private_key"\s*:\s*"-----BEGIN (RSA )?PRIVATE KEY-----'''
+tags = ["key", "GCP"]
+
+# --- Azure ---
+[[rules]]
+id = "azure-storage-key"
+description = "Azure Storage Account Key"
+regex = '''AccountKey=[A-Za-z0-9+/=]{44,}'''
+tags = ["key", "Azure"]
+
+# --- Slack ---
+[[rules]]
+id = "slack-bot-token"
+description = "Slack Bot/App Token"
+regex = '''xox[baprs]-[0-9]{10,13}-[0-9]{10,13}[a-zA-Z0-9-]*'''
+tags = ["key", "Slack"]
+
+[[rules]]
+id = "slack-webhook"
+description = "Slack Webhook URL"
+regex = '''https://hooks\.slack\.com/services/T[A-Z0-9]{8,}/B[A-Z0-9]{8,}/[A-Za-z0-9]{24,}'''
+tags = ["key", "Slack"]
+
+# --- OpenAI ---
+[[rules]]
+id = "openai-key"
+description = "OpenAI API Key"
+regex = '''(?:sk-[A-Za-z0-9]{48}|sk-proj-[A-Za-z0-9_-]{20,255}|sk-svcacct-[A-Za-z0-9_-]{20,255})'''
+tags = ["key", "OpenAI"]
+
+# --- Stripe ---
+[[rules]]
+id = "stripe-key"
+description = "Stripe API Key"
+regex = '''sk_(live|test)_[0-9a-zA-Z]{24,99}'''
+tags = ["key", "Stripe"]
+
+# --- SendGrid ---
+[[rules]]
+id = "sendgrid-key"
+description = "SendGrid API Key"
+regex = '''SG\.[A-Za-z0-9_-]{16,}\.[A-Za-z0-9_-]{16,}'''
+tags = ["key", "SendGrid"]
+
+# --- Database ---
+[[rules]]
+id = "database-url"
+description = "Database Connection String with Password"
+regex = '''(postgres(ql)?|mysql|mongodb(\+srv)?)://[^:]+:[^@]+@.+'''
+tags = ["key", "database"]
+
+# --- Azure OpenAI (AOAI) ---
+[[rules]]
+id = "azure-openai-key"
+description = "Azure OpenAI API Key"
+regex = '''(?i)(azure[_-]?openai[_-]?api[_-]?key|AZURE_OPENAI_API_KEY)\s*[:=]\s*["']?[a-f0-9]{32}["']?'''
+tags = ["key", "Azure", "OpenAI"]
+
+# --- Google ---
+[[rules]]
+id = "google-oauth-client-secret"
+description = "Google OAuth Client Secret"
+regex = '''GOCSPX-[A-Za-z0-9_-]{28}'''
+tags = ["key", "Google"]
+
+
+# --- Firecrawl ---
+[[rules]]
+id = "firecrawl-key"
+description = "Firecrawl API Key"
+regex = '''fc-[A-Za-z0-9]{32,}'''
+tags = ["key", "Firecrawl"]
+
+
+# --- Twilio ---
+[[rules]]
+id = "twilio-key"
+description = "Twilio API Key"
+regex = '''SK[0-9a-fA-F]{32}'''
+tags = ["key", "Twilio"]
+
+# --- Mailgun ---
+[[rules]]
+id = "mailgun-key"
+description = "Mailgun API Key"
+regex = '''key-[0-9a-zA-Z]{32}'''
+tags = ["key", "Mailgun"]
+
+# --- JWT ---
+[[rules]]
+id = "jwt-token"
+description = "JWT Token"
+regex = '''eyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}'''
+tags = ["key", "JWT"]
+
+# --- npm ---
+[[rules]]
+id = "npm-token"
+description = "npm Access Token"
+regex = '''npm_[A-Za-z0-9]{36}'''
+tags = ["key", "npm"]
+
+# --- Datadog ---
+[[rules]]
+id = "datadog-api-key"
+description = "Datadog API Key (32-char hex)"
+regex = '''(?i)(dd[_-]?api[_-]?key|datadog[_-]?api[_-]?key)\s*[:=]\s*["']?[a-f0-9]{32}["']?'''
+tags = ["key", "Datadog"]
+
+[[rules]]
+id = "datadog-app-key"
+description = "Datadog Application Key (40-char hex)"
+regex = '''(?i)(dd[_-]?app[_-]?key|datadog[_-]?app[_-]?key)\s*[:=]\s*["']?[a-f0-9]{40}["']?'''
+tags = ["key", "Datadog"]
+
+# --- AWS Cognito ---
+[[rules]]
+id = "cognito-client-secret"
+description = "AWS Cognito Client Secret"
+regex = '''(?i)(cognito[_-]?client[_-]?secret|user[_-]?pool[_-]?client[_-]?secret)\s*[:=]\s*["']?[A-Za-z0-9+/=]{48,}["']?'''
+tags = ["key", "AWS", "Cognito"]
+
+# --- Generic ---
+[[rules]]
+id = "private-key"
+description = "Private Key"
+regex = '''-----BEGIN (RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----'''
+tags = ["key"]
+
+[[rules]]
+id = "generic-api-key"
+description = "Generic API Key assignment"
+regex = '''(?i)(api[_-]?key|apikey|secret[_-]?key|access[_-]?token)\s*[:=]\s*["']?[A-Za-z0-9/+=_-]{20,}["']?'''
+tags = ["key", "generic"]
+
+# --- Allowlist ---
+[[allowlists]]
+description = "Example placeholder credentials in docs/scripts"
+paths = [
+  '''README\.md''',
+  '''mfa\.sh''',
+  '''ansible/playbook-all-users\.yml''',
+  '''ansible/templates/aws_credentials\.j2''',
+]
+regexes = [
+  '''AKIAX{16}''',
+  '''[xX]{24,}''',
+  '''YOUR_SECRET_ACCESS_KEY''',
+  '''YOUR_ACCESS_KEY_ID''',
+]
+
+[[allowlists]]
+description = "Placeholder database passwords in examples"
+regexTarget = "match"
+regexes = [
+  ''':(password|pass|secret|example|changeme|test|dummy)@''',
+]
